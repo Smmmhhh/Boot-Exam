@@ -1,13 +1,18 @@
 package com.exam.smh.service;
 
 import com.exam.smh.dto.GuestbookDTO;
+import com.exam.smh.dto.PageRequestDTO;
+import com.exam.smh.dto.PageResultDTO;
 import com.exam.smh.entity.GuestBook;
 import com.exam.smh.repotsitory.GuestbookRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.function.Function;
 
 @Service
 @Log4j2
@@ -22,16 +27,28 @@ public class GuestbookServiceImpl implements GuestbookService {
     @Override
     public Long register(GuestbookDTO dto) {
 
-        log.info("DTO--------------------");
-        log.info(dto);
-
+        // 전달받은 dto를 entity 클래스로 변환시킨다.
         GuestBook entity = dtoToEntity(dto);
-
-        log.info(entity);
 
         // GuestBook을 저장한다
         repository.save(entity);
 
         return entity.getGno();
+    }
+
+    /**
+     * 페이징 처리된 목록을 돌려준다.
+     */
+    @Override
+    public PageResultDTO<GuestbookDTO, GuestBook> getList(PageRequestDTO requestDTO) {
+
+        Pageable pageable = requestDTO.getPageable(Sort.by("gno").descending());
+
+        Page<GuestBook> result = repository.findAll(pageable);
+
+        // entityToDto 메서드를 이용해서 Funtion을 생성하고 이를 PageResultDTO로 구성한다.
+        Function<GuestBook, GuestbookDTO> fn = (entity -> entityToDto(entity));
+
+        return new PageResultDTO<>(result, fn);
     }
 }
