@@ -17,6 +17,11 @@ public interface GuestbookService {
     PageResultDTO<GuestbookDTO, GuestBook> getList(PageRequestDTO requestDTO);
 
     /**
+     * 게시물을 조회한다.
+     */
+    GuestbookDTO read(Long gno);
+
+    /**
      * 클라이언트로 받은 dto를 entity 객체로 변환시켜준다.
      *
      * @param dto
