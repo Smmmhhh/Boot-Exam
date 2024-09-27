@@ -55,9 +55,8 @@ public class GuestBookController {
     @GetMapping("/read")
     public void read(Long gno, @ModelAttribute("requestDTO") PageRequestDTO requestDTO, Model model) {
 
-        log.info("gno : " + gno);
-
         GuestbookDTO dto = service.read(gno);
+        log.info("read dto : " + dto);
 
         model.addAttribute("dto", dto);
     }

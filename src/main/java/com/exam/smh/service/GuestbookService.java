@@ -47,6 +47,8 @@ public interface GuestbookService {
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .writer(entity.getWriter())
+                .modDate(entity.getModDate())
+                .regDate(entity.getRegDate())
                 .build();
         return dto;
     }
