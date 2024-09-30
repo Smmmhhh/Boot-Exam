@@ -22,6 +22,16 @@ public interface GuestbookService {
     GuestbookDTO read(Long gno);
 
     /**
+     * 게시물을 수정한다.
+     */
+    void modify(GuestbookDTO dto);
+
+    /**
+     * 게시물을 삭제한다.
+     */
+    void remove(Long gno);
+
+    /**
      * 클라이언트로 받은 dto를 entity 객체로 변환시켜준다.
      *
      * @param dto
