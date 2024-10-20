@@ -10,6 +10,8 @@
         <form action="guestbook/modify" method="post">
             <!-- 페이지 번호 -->
             <input type="hidden" name="page" th:value="${requestDTO.page}">
+            <input type="hidden" name="type" th:value="${requestDTO.type}">
+            <input type="hidden" name="keyword" th:value="${requestDTO.keyword}">
 
             <div class="form-group">
                 <label>Gno</label>
@@ -34,13 +36,15 @@
             <div class="form-group">
                 <label>RegDate</label>
                 <input type="text" class="form-control"
-                       th:value="${dto.regDate != null ? #temporals.format(dto.regDate, 'yyyy/MM/dd HH:mm:ss') : 'N/A'}" readonly>
+                       th:value="${dto.regDate != null ? #temporals.format(dto.regDate, 'yyyy/MM/dd HH:mm:ss') : 'N/A'}"
+                       readonly>
             </div>
 
             <div class="form-group">
                 <label>ModDate</label>
                 <input type="text" class="form-control"
-                       th:value="${dto.modDate != null ? #temporals.format(dto.modDate, 'yyyy/MM/dd HH:mm:ss') : 'N/A'}" readonly>
+                       th:value="${dto.modDate != null ? #temporals.format(dto.modDate, 'yyyy/MM/dd HH:mm:ss') : 'N/A'}"
+                       readonly>
             </div>
         </form>
 
@@ -53,7 +57,7 @@
             var actionForm = $("form"); // form 태그 객체
 
             <!-- 삭제버튼 -->
-            $(".removeBtn").click(function() {
+            $(".removeBtn").click(function () {
                 actionForm
                     .attr("action", "/guestbook/remove")
                     .attr("method", "post");
@@ -61,7 +65,7 @@
                 actionForm.submit();
             });
             <!-- 수정버튼 -->
-            $(".modifyBtn").click(function() {
+            $(".modifyBtn").click(function () {
 
                 if (!confirm("수정하시겠습니까?")) {
                     return;
@@ -74,12 +78,18 @@
             });
 
             <!-- 목록버튼 -->
-            $(".listBtn").click(function() {
+            $(".listBtn").click(function () {
 
-                var pageInfo = $("input[name='page']");
+                // var pageInfo = $("input[name='page']");
+                var page = $("input[name='page']");
+                var type = $("input[name='type']");
+                var keyword = $("input[name='keyword']");
 
                 actionForm.empty();
-                actionForm.append(pageInfo);
+
+                actionForm.append(page);
+                actionForm.append(type);
+                actionForm.append(keyword);
 
                 actionForm
                     .attr("action", "/guestbook/list")

@@ -4,7 +4,10 @@ import com.exam.smh.dto.GuestbookDTO;
 import com.exam.smh.dto.PageRequestDTO;
 import com.exam.smh.dto.PageResultDTO;
 import com.exam.smh.entity.GuestBook;
+import com.exam.smh.entity.QGuestBook;
 import com.exam.smh.repotsitory.GuestbookRepository;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -45,7 +48,10 @@ public class GuestbookServiceImpl implements GuestbookService {
 
         Pageable pageable = requestDTO.getPageable(Sort.by("gno").descending());
 
-        Page<GuestBook> result = repository.findAll(pageable);
+        // 검색조건을 가져온다.
+        BooleanBuilder booleanBuilder = getSearch(requestDTO);
+
+        Page<GuestBook> result = repository.findAll(booleanBuilder, pageable);
 
         // entityToDto 메서드를 이용해서 Funtion을 생성하고 이를 PageResultDTO로 구성한다.
         Function<GuestBook, GuestbookDTO> fn = (entity) -> entityToDto(entity);
@@ -55,6 +61,7 @@ public class GuestbookServiceImpl implements GuestbookService {
 
     /**
      * 게시물을 조회한다.
+     *
      * @param gno
      * @return
      */
@@ -68,6 +75,7 @@ public class GuestbookServiceImpl implements GuestbookService {
 
     /**
      * 게시물을 수정한다.
+     *
      * @param dto
      */
     @Override
@@ -88,10 +96,58 @@ public class GuestbookServiceImpl implements GuestbookService {
 
     /**
      * 게시물을 삭제한다.
+     *
      * @param gno
      */
     @Override
     public void remove(Long gno) {
         repository.deleteById(gno);
+    }
+
+    /**
+     * 검색결과를 돌려준다.
+     *
+     * @param requestDTO
+     * @return
+     */
+    private BooleanBuilder getSearch(PageRequestDTO requestDTO) {
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        QGuestBook qGuestBook = QGuestBook.guestBook;
+
+        String type = requestDTO.getType();
+        String keyword = requestDTO.getKeyword();
+
+        BooleanExpression expression = qGuestBook.gno.gt(0L); // gno > 0 조건만 생성
+
+        booleanBuilder.and(expression);
+
+        // 검색조건이 없는경우 그대로 반환한다.
+        if (type == null || type.trim().isEmpty()) {
+            return booleanBuilder;
+        }
+
+        // 검색조건을 작성하기
+        BooleanBuilder conditionBuilder = new BooleanBuilder();
+
+        // 제목
+        if (type.contains("t")) {
+            conditionBuilder.or(qGuestBook.title.contains(keyword));
+        }
+
+        // 본문
+        if (type.contains("c")) {
+            conditionBuilder.or(qGuestBook.content.contains(keyword));
+        }
+
+        // 작성자
+        if (type.contains("w")) {
+            conditionBuilder.or(qGuestBook.writer.contains(keyword));
+        }
+
+        // 모든조건 통합
+        booleanBuilder.and(conditionBuilder);
+
+        return booleanBuilder;
     }
 }

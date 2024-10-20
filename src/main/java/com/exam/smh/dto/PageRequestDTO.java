@@ -17,6 +17,8 @@ public class PageRequestDTO {
 
     private int page;
     private int size;
+    private String type;
+    private String keyword;
 
     /**
      * 기본 페이지와 갯수를 설정한다.
